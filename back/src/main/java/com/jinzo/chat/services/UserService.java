@@ -15,12 +15,6 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User createUser(User user) {
-        if(userRepository.findByUsername(user.getUsername()) != null)
-            throw new IllegalStateException("Username is already in use");
-        return userRepository.save(user);
-    }
-
     public User getUserById(Long id){
         return userRepository.findById(id).orElse(null);
     }
