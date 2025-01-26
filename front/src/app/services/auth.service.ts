@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -7,15 +7,18 @@ import { Router } from '@angular/router';
 })
 export class AuthService {
   private tokenKey = 'jinzo';
+  private apiUrl = 'http://localhost:8080'; // Add the backend URL here
 
   constructor(private http: HttpClient, private router: Router) {}
 
   register(user: { username: string, password: string }) {
-    return this.http.post('/auth/register', user);
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post(`${this.apiUrl}/auth/register`, user, { headers, withCredentials: true, responseType: 'text' }); // Use the full URL
   }
 
-  login(username: string, password: string) {
-    return this.http.post('/auth/login', { username, password });
+  login(user: { username: string, password: string }) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post(`${this.apiUrl}/auth/login`, user, { headers, withCredentials: true, responseType: 'text' }); // Use the full URL
   }
 
   logout() {

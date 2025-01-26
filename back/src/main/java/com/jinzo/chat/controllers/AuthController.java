@@ -18,7 +18,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password) {
-        return authService.login(username, password);
+    public String login(@RequestBody User user) {
+        System.out.println("ssssssssssssssssssssss "+user.getUsername());
+        return authService.login(user.getUsername(), user.getPassword());
     }
 }

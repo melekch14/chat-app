@@ -1,0 +1,51 @@
+<div class="background-elements">
+    <div class="shape circle"></div>
+    <div class="shape square"></div>
+    <div class="shape triangle"></div>
+    <div class="shape circle"></div>
+    <div class="shape square"></div>
+    <div class="shape triangle"></div>
+</div>
+
+<!-- Auth Container -->
+<div class="auth-container">
+    <!-- Login Form -->
+    <div class="auth-form" [ngClass]="{'hidden': !showLoginForm}">
+        <h2>Login</h2>
+        <form (ngSubmit)="onLoginSubmit($event)">
+            <div class="input-group">
+                <label for="login-username">Username</label>
+                <input type="text" id="login-username" placeholder="Enter your username" required
+                    [(ngModel)]="loginUsername" name="loginUsername">
+            </div>
+            <div class="input-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" placeholder="Enter your password" required
+                    [(ngModel)]="loginPassword" name="loginPassword">
+            </div>
+            <button type="submit" class="auth-button">Login</button>
+            <p *ngIf="loginError" class="error-message">{{ loginError }}</p>
+        </form>
+        <p>Don't have an account? <a href="#" (click)="toggleForm($event)">Register</a></p>
+    </div>
+
+    <!-- Register Form -->
+    <div class="auth-form" [ngClass]="{'hidden': showLoginForm}">
+        <h2>Register</h2>
+        <form (ngSubmit)="onRegisterSubmit($event)">
+            <div class="input-group">
+                <label for="register-username">Username</label>
+                <input type="text" id="register-username" placeholder="Choose a username" required
+                    [(ngModel)]="registerUsername" name="registerUsername">
+            </div>
+            <div class="input-group">
+                <label for="register-password">Password</label>
+                <input type="password" id="register-password" placeholder="Choose a password" required
+                    [(ngModel)]="registerPassword" name="registerPassword">
+            </div>
+            <button type="submit" class="auth-button">Register</button>
+            <p *ngIf="registerError" class="error-message">{{ registerError }}</p>
+        </form>
+        <p>Already have an account? <a href="#" (click)="toggleForm($event)">Login</a></p>
+    </div>
+</div>
