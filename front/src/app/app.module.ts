@@ -7,12 +7,14 @@ import { LoginAndRegisterComponent } from './Components/login-and-register/login
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { ChatComponent } from './Components/chat/chat.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     GeneralComponent,
-    LoginAndRegisterComponent
+    LoginAndRegisterComponent,
+    ChatComponent
   ],
   imports: [
     BrowserModule,

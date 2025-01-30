@@ -21,6 +21,7 @@ public class Message {
     private Long id;
     private String content;
     private LocalDateTime timestamp;
+    private String roomName;
     @ManyToOne
     private User sender;
     @ManyToOne

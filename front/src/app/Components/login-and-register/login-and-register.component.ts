@@ -35,7 +35,11 @@ export class LoginAndRegisterComponent {
       next: (token: string) => {
         console.log('Login successful', token);
         this.authService.setToken(token);
-        this.router.navigate(['/general']);
+        const decodedToken = this.authService.decodeToken(token);
+        const username = decodedToken['sub'];
+        this.authService.setCurrentUsername(username.toString());
+        localStorage.setItem('username', username.toString());
+        this.router.navigate(['/chat', 'GN']);
         this.clearFields();
       },
       error: (error) => {

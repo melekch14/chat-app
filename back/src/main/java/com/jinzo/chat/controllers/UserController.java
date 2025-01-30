@@ -19,6 +19,11 @@ public class UserController {
         return userService.getUserById(id);
     }
 
+    @GetMapping("/user/byusername/{username}")
+    public User getUser(@PathVariable String username) {
+        return userService.getUserByUsername(username);
+    }
+
     @GetMapping("/user")
     public List<User> getAllUsers() {
         return userService.getAllUsers();

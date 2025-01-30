@@ -1,0 +1,99 @@
+<div class="container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="server-list">
+      <div
+        *ngFor="let server of servers"
+        class="server-icon"
+        [class.active]="server.name === selectedServer?.name"
+        (click)="selectServer(server.name)"
+      >
+        {{ server.name }}
+      </div>
+      <div class="server-icon add-server" (click)="openAddServerModal()">+</div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="header">
+      <div class="channel-info">
+        <span class="channel-name">#{{ selectedServer?.name || 'general' }}</span>
+        <span class="channel-topic"
+          >Welcome to the {{ selectedServer?.name || 'general' }} channel!</span
+        >
+      </div>
+      <div class="user-status">
+        <span class="status-icon"></span>
+        <span class="status-text">Online</span>
+      </div>
+    </div>
+    <div class="chat">
+      <div *ngFor="let message of messages" class="message">
+        <div class="message-author">{{ message.sender }}</div>
+        <div class="message-content">{{ message.text }}</div>
+        <div class="message-timestamp">
+          {{ message.timestamp | date: 'shortTime' }}
+        </div>
+      </div>
+    </div>
+    <div class="message-input">
+      <input
+        type="text"
+        [(ngModel)]="currentMessage"
+        (keyup.enter)="sendMessage()"
+        placeholder="Type your message here..."
+      />
+      <button class="send-button" (click)="sendMessage()">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- User List -->
+  <div class="user-list">
+    <div
+      *ngFor="let user of users"
+      class="user"
+      [class.active]="user.username === selectedUser?.username"
+      (click)="selectUser(user)"
+    >
+      <div class="user-avatar">
+        <img src="assets/pic.jpg" alt="{{ user?.username || 'Unknown User' }}" />
+      </div>
+      <div class="user-info">
+        <span class="username">{{ user?.username || 'Unknown User' }}</span>
+        <span
+          class="user-status-icon"
+          [class.online]="user?.status === 'online'"
+          [class.offline]="user?.status === 'offline'"
+        ></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Server Modal -->
+  <div class="modal-overlay" *ngIf="isAddServerModalOpen">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Add or Join a Room</h2>
+        <button class="close-button" (click)="closeAddServerModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input
+          type="text"
+          [(ngModel)]="newRoomName"
+          placeholder="Enter room name"
+        />
+      </div>
+      <div class="modal-footer">
+        <button class="modal-button" (click)="addOrJoinRoom()">Add/Join</button>
+        <button class="modal-button cancel" (click)="closeAddServerModal()">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
