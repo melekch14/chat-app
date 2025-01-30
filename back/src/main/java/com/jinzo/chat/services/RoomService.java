@@ -63,9 +63,7 @@ public class RoomService {
     }
 
     public List<User> getConnectedUsersPerRoom(String roomId) {
-        List<User> users = roomUserService.getConnectedUsersPerRoom(roomId);
-        System.out.println("vvvvvvvvvvvv " + users.size());
-        return users;
+        return roomUserService.getConnectedUsersPerRoom(roomId);
     }
 
 }

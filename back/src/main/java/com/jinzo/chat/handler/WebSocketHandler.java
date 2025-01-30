@@ -14,6 +14,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -23,6 +24,7 @@ public class WebSocketHandler extends TextWebSocketHandler implements RoomUserSe
     private static final ConcurrentHashMap<String, CopyOnWriteArrayList<WebSocketSession>> roomSessions = new ConcurrentHashMap<>();
     private final UserService userService;
     private final MessageService messageService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public WebSocketHandler(UserService userService, MessageService messageService) {
         this.userService = userService;
@@ -32,13 +34,18 @@ public class WebSocketHandler extends TextWebSocketHandler implements RoomUserSe
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         String roomId = getRoomId(session);
-        String username = getUsernameFromSession(session); // Extract username from query parameters
-        User user = userService.getUserByUsername(username); // Fetch user by username
+        String username = getUsernameFromSession(session);
+        User user = userService.getUserByUsername(username);
 
         if (user != null) {
             session.getAttributes().put("user", user);
             System.out.println("New connection established for room: " + roomId + " by user: " + user.getUsername());
+
+            // Add the session to the room
             roomSessions.computeIfAbsent(roomId, k -> new CopyOnWriteArrayList<>()).add(session);
+
+            // Broadcast user joined event to all clients in the room
+            broadcastUserEvent(roomId, "USER_JOINED", user);
         } else {
             session.close();
         }
@@ -50,7 +57,6 @@ public class WebSocketHandler extends TextWebSocketHandler implements RoomUserSe
         System.out.println("Received message: " + payload);
         String roomId = getRoomId(session);
 
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
             JsonNode jsonNode = objectMapper.readTree(payload);
             String sender = jsonNode.get("sender").asText();
@@ -61,23 +67,28 @@ public class WebSocketHandler extends TextWebSocketHandler implements RoomUserSe
             msg.setSender(user);
             msg.setRoomName(roomId);
             messageService.storeMessage(msg);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        CopyOnWriteArrayList<WebSocketSession> sessions = roomSessions.get(roomId);
-        if (sessions != null) {
-            for (WebSocketSession webSocketSession : sessions) {
-                if (webSocketSession.isOpen()) {
-                    webSocketSession.sendMessage(new TextMessage(payload));
+
+            // Broadcast the message to all clients in the room
+            CopyOnWriteArrayList<WebSocketSession> sessions = roomSessions.get(roomId);
+            if (sessions != null) {
+                for (WebSocketSession webSocketSession : sessions) {
+                    if (webSocketSession.isOpen()) {
+                        webSocketSession.sendMessage(new TextMessage(payload));
+                    }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, org.springframework.web.socket.CloseStatus status) throws Exception {
         String roomId = getRoomId(session);
-        System.out.println("Connection closed for room: " + roomId);
+        User user = (User) session.getAttributes().get("user");
+        System.out.println("Connection closed for room: " + roomId + " by user: " + user.getUsername());
+
+        // Remove the session from the room
         CopyOnWriteArrayList<WebSocketSession> sessions = roomSessions.get(roomId);
         if (sessions != null) {
             sessions.remove(session);
@@ -85,17 +96,37 @@ public class WebSocketHandler extends TextWebSocketHandler implements RoomUserSe
                 roomSessions.remove(roomId);
             }
         }
+
+        // Broadcast user left event to all clients in the room
+        broadcastUserEvent(roomId, "USER_LEFT", user);
+    }
+
+    private void broadcastUserEvent(String roomId, String eventType, User user) {
+        try {
+            String eventPayload = objectMapper.writeValueAsString(Map.of(
+                    "event", eventType,
+                    "user", user.getUsername()
+            ));
+
+            CopyOnWriteArrayList<WebSocketSession> sessions = roomSessions.get(roomId);
+            if (sessions != null) {
+                for (WebSocketSession webSocketSession : sessions) {
+                    if (webSocketSession.isOpen()) {
+                        webSocketSession.sendMessage(new TextMessage(eventPayload));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private String getRoomId(WebSocketSession session) {
-        // Extract room ID from the session URI
         String path = session.getUri().getPath();
-        System.out.println("Path: " + path);
         return path.substring(path.lastIndexOf('/') + 1);
     }
 
     private String getUsernameFromSession(WebSocketSession session) {
-        // Extract username from the session URI or query parameters
         String query = session.getUri().getQuery();
         if (query != null) {
             String[] pairs = query.split("&");
@@ -106,7 +137,7 @@ public class WebSocketHandler extends TextWebSocketHandler implements RoomUserSe
                 }
             }
         }
-        return null; // Handle this case appropriately
+        return null;
     }
 
     @Override

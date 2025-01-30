@@ -1,328 +1,468 @@
 /* General Reset */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: 'Arial', sans-serif;
-    background-color: #1e1e2f; /* New primary background */
-    color: #ffffff; /* White text */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #1e1e2f; /* New primary background */
+  color: #ffffff; /* White text */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  display: flex;
+  width: 1200px;
+  height: 800px;
+  background-color: #2a2a3d; /* New secondary background */
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  background-color: #1e1e2f; /* Dark purple */
+  display: flex;
+  flex-direction: column;
+}
+
+.server-list {
+  padding: 10px;
+  background-color: #1e1e2f;
+  border-bottom: 1px solid #2a2a3d;
+}
+
+.server-icon {
+  width: 50px;
+  height: 50px;
+  background-color: #ff7eb6; /* Pink accent */
+  border-radius: 50%;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  color: #ffffff; /* White text */
+  cursor: pointer;
+  transition: background-color 0.2s, border-radius 0.2s;
+}
+
+.server-icon:hover {
+  background-color: #ff5c9e; /* Darker pink on hover */
+  border-radius: 30%;
+}
+
+.server-icon.active {
+  background-color: #ff5c9e; /* Darker pink for active state */
+  border-radius: 30%;
+  border: 2px solid #ffffff; /* Add a white border */
+  box-shadow: 0 0 10px rgba(255, 94, 158, 0.8); /* Add a glow effect */
+}
+
+.add-server {
+  background-color: #2a2a3d; /* Secondary background */
+  color: #ff7eb6; /* Pink accent */
+  font-size: 24px;
+}
+
+.add-server:hover {
+  background-color: #ff7eb6; /* Pink on hover */
+  color: #ffffff; /* White text */
+}
+
+.channel-list {
+  padding: 10px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+#logout {
+  background-color: #a00;
+  width: 100%;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  font-weight: 600;
+  color: White;
+  padding: 5px;
+}
+
+#logout:hover {
+  background-color: #ffffff55;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #2a2a3d; /* Secondary background */
+}
+
+.header {
+  padding: 10px;
+  background-color: #1e1e2f; /* Dark purple */
+  border-bottom: 1px solid #2a2a3d;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.channel-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.channel-name {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.channel-topic {
+  font-size: 12px;
+  color: #a5a5b8; /* Light gray */
+}
+
+.user-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-icon {
+  width: 10px;
+  height: 10px;
+  background-color: #43b581; /* Green for online status */
+  border-radius: 50%;
+}
+
+.status-text {
+  font-size: 14px;
+  color: #43b581; /* Green for online status */
+}
+
+.chat {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.message {
+  margin-bottom: 10px;
+}
+
+.message-author {
+  font-weight: bold;
+  color: #ff7eb6; /* Pink for message author */
+}
+
+.message-content {
+  margin-left: 10px;
+  color: #ffffff; /* White text */
+}
+
+.message-timestamp {
+  margin-left: 10px;
+  font-size: 12px;
+  color: #a5a5b8; /* Light gray */
+}
+
+.message-input {
+  padding: 10px;
+  background-color: #1e1e2f; /* Dark purple */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.message-input input {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  background-color: #2a2a3d; /* Secondary background */
+  color: #ffffff; /* White text */
+  outline: none;
+}
+
+.send-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ff7eb6; /* Pink accent */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.send-button:hover {
+  background-color: #ff7eb6; /* Pink on hover */
+  color: #ffffff; /* White text */
+}
+
+.send-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* User List */
+.user-list {
+  width: 240px;
+  background-color: #1e1e2f; /* Dark purple */
+  padding: 10px;
+}
+
+.user {
+  padding: 8px;
+  color: #a5a5b8; /* Light gray */
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.user:hover {
+  background-color: #3a3a4d; /* Lighter purple on hover */
+  color: #ffffff; /* White text */
+}
+
+.user.active {
+  background-color: #ff7eb6; /* Pink for active state */
+  color: #ffffff; /* White text */
+}
+
+.user-avatar img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.username {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.user-status-icon {
+  width: 10px;
+  height: 10px;
+  background-color: #43b581; /* Green for online status */
+  border-radius: 50%;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal */
+.modal {
+  background-color: #2a2a3d; /* Secondary background */
+  border-radius: 8px;
+  width: 400px;
+  padding: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  color: #ffffff; /* White text */
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: #ff7eb6; /* Pink accent */
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modal-body input {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  background-color: #1e1e2f; /* Dark purple */
+  color: #ffffff; /* White text */
+  outline: none;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #ff7eb6; /* Pink accent */
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-button:hover {
+  background-color: #ff5c9e; /* Darker pink on hover */
+}
+
+.modal-button.cancel {
+  background-color: #2a2a3d; /* Secondary background */
+  color: #ff7eb6; /* Pink accent */
+}
+
+.modal-button.cancel:hover {
+  background-color: #3a3a4d; /* Lighter purple on hover */
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 1200px) {
   .container {
-    display: flex;
-    width: 1200px;
-    height: 800px;
-    background-color: #2a2a3d; /* New secondary background */
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      width: 100%;
+      height: 100vh;
+      border-radius: 0;
   }
-  
-  /* Sidebar */
+
   .sidebar {
-    width: 240px;
-    background-color: #1e1e2f; /* Dark purple */
-    display: flex;
-    flex-direction: column;
+      width: 200px;
   }
-  
-  .server-list {
-    padding: 10px;
-    background-color: #1e1e2f;
-    border-bottom: 1px solid #2a2a3d;
-  }
-  
-  .server-icon {
-    width: 50px;
-    height: 50px;
-    background-color: #ff7eb6; /* Pink accent */
-    border-radius: 50%;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 18px;
-    color: #ffffff; /* White text */
-    cursor: pointer;
-    transition: background-color 0.2s, border-radius 0.2s;
-  }
-  
-  .server-icon:hover {
-    background-color: #ff5c9e; /* Darker pink on hover */
-    border-radius: 30%;
-  }
-  
-  .server-icon.active {
-    background-color: #ff5c9e; /* Darker pink for active state */
-    border-radius: 30%;
-  }
-  
-  .add-server {
-    background-color: #2a2a3d; /* Secondary background */
-    color: #ff7eb6; /* Pink accent */
-    font-size: 24px;
-  }
-  
-  .add-server:hover {
-    background-color: #ff7eb6; /* Pink on hover */
-    color: #ffffff; /* White text */
-  }
-  
-  /* Main Content */
-  .main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background-color: #2a2a3d; /* Secondary background */
-  }
-  
-  .header {
-    padding: 10px;
-    background-color: #1e1e2f; /* Dark purple */
-    border-bottom: 1px solid #2a2a3d;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .channel-info {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .channel-name {
-    font-size: 16px;
-    font-weight: bold;
-  }
-  
-  .channel-topic {
-    font-size: 12px;
-    color: #a5a5b8; /* Light gray */
-  }
-  
-  .user-status {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  
-  .status-icon {
-    width: 10px;
-    height: 10px;
-    background-color: #43b581; /* Green for online status */
-    border-radius: 50%;
-  }
-  
-  .status-text {
-    font-size: 14px;
-    color: #43b581; /* Green for online status */
-  }
-  
-  .chat {
-    flex: 1;
-    padding: 10px;
-    overflow-y: auto;
-  }
-  
-  .message {
-    margin-bottom: 10px;
-  }
-  
-  .message-author {
-    font-weight: bold;
-    color: #ff7eb6; /* Pink for message author */
-  }
-  
-  .message-content {
-    margin-left: 10px;
-    color: #ffffff; /* White text */
-  }
-  
-  .message-timestamp {
-    margin-left: 10px;
-    font-size: 12px;
-    color: #a5a5b8; /* Light gray */
-  }
-  
-  .message-input {
-    padding: 10px;
-    background-color: #1e1e2f; /* Dark purple */
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .message-input input {
-    flex: 1;
-    padding: 8px;
-    border: none;
-    border-radius: 4px;
-    background-color: #2a2a3d; /* Secondary background */
-    color: #ffffff; /* White text */
-    outline: none;
-  }
-  
-  .send-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #ff7eb6; /* Pink accent */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
-    border-radius: 4px;
-    transition: background-color 0.2s, color 0.2s;
-  }
-  
-  .send-button:hover {
-    background-color: #ff7eb6; /* Pink on hover */
-    color: #ffffff; /* White text */
-  }
-  
-  .send-button svg {
-    width: 20px;
-    height: 20px;
-  }
-  
-  /* User List */
+
   .user-list {
-    width: 240px;
-    background-color: #1e1e2f; /* Dark purple */
-    padding: 10px;
+      width: 200px;
   }
-  
-  .user {
-    padding: 8px;
-    color: #a5a5b8; /* Light gray */
-    cursor: pointer;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: background-color 0.2s, color 0.2s;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+      width: 60px;
   }
-  
-  .user:hover {
-    background-color: #3a3a4d; /* Lighter purple on hover */
-    color: #ffffff; /* White text */
+
+  .server-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 16px;
   }
-  
-  .user.active {
-    background-color: #ff7eb6; /* Pink for active state */
-    color: #ffffff; /* White text */
+
+  .add-server {
+      font-size: 20px;
   }
-  
+
+  .user-list {
+      width: 60px;
+  }
+
   .user-avatar img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
+      width: 30px;
+      height: 30px;
   }
-  
-  .user-info {
-    display: flex;
-    flex-direction: column;
-  }
-  
+
   .username {
-    font-size: 14px;
-    font-weight: bold;
+      display: none;
   }
-  
+
   .user-status-icon {
-    width: 10px;
-    height: 10px;
-    background-color: #43b581; /* Green for online status */
-    border-radius: 50%;
+      display: none;
   }
-  
-  /* Modal Overlay */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+
+  .channel-name {
+      font-size: 14px;
   }
-  
-  /* Modal */
-  .modal {
-    background-color: #2a2a3d; /* Secondary background */
-    border-radius: 8px;
-    width: 400px;
-    padding: 20px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+
+  .channel-topic {
+      font-size: 10px;
   }
-  
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+
+  .message-input input {
+      padding: 6px;
   }
-  
-  .modal-header h2 {
-    font-size: 18px;
-    color: #ffffff; /* White text */
+
+  .send-button {
+      padding: 6px;
   }
-  
-  .close-button {
-    background: none;
-    border: none;
-    color: #ff7eb6; /* Pink accent */
-    font-size: 24px;
-    cursor: pointer;
+
+  .send-button svg {
+      width: 16px;
+      height: 16px;
   }
-  
-  .modal-body input {
-    width: 100%;
-    padding: 8px;
-    border: none;
-    border-radius: 4px;
-    background-color: #1e1e2f; /* Dark purple */
-    color: #ffffff; /* White text */
-    outline: none;
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+      width: 50px;
   }
-  
-  .modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
+
+  .server-icon {
+      width: 30px;
+      height: 30px;
+      font-size: 14px;
   }
-  
-  .modal-button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    background-color: #ff7eb6; /* Pink accent */
-    color: #ffffff;
-    cursor: pointer;
-    transition: background-color 0.2s;
+
+  .add-server {
+      font-size: 18px;
   }
-  
-  .modal-button:hover {
-    background-color: #ff5c9e; /* Darker pink on hover */
+
+  .user-list {
+      width: 50px;
   }
-  
-  .modal-button.cancel {
-    background-color: #2a2a3d; /* Secondary background */
-    color: #ff7eb6; /* Pink accent */
+
+  .user-avatar img {
+      width: 25px;
+      height: 25px;
   }
-  
-  .modal-button.cancel:hover {
-    background-color: #3a3a4d; /* Lighter purple on hover */
+
+  .channel-name {
+      font-size: 12px;
   }
+
+  .channel-topic {
+      font-size: 8px;
+  }
+
+  .message-input input {
+      padding: 4px;
+  }
+
+  .send-button {
+      padding: 4px;
+  }
+
+  .send-button svg {
+      width: 14px;
+      height: 14px;
+  }
+}

@@ -30,7 +30,6 @@ export class RoomService {
       })
       .subscribe({
         next: (users) => {
-          console.log("sssssssssssssss "+users)
           this.usersSubject.next(users);
         },
         error: (err) => {

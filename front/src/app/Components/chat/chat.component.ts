@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewChecked, ElementRef, ViewChild } from '@angular/core';
 import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RoomService } from '../../services/room.service';
@@ -15,16 +15,18 @@ interface ChatMessage {
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css'],
 })
-export class ChatComponent implements OnInit, OnDestroy {
+export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
+  @ViewChild('chatContainer') private chatContainer!: ElementRef;
+
   private socket$!: WebSocketSubject<any>;
-  private socketSubscription!: Subscription; // Store the WebSocket subscription
+  private socketSubscription!: Subscription;
   messages: ChatMessage[] = [];
   currentMessage = '';
-  roomId!: string; // This is the selectedServer
-  servers: any[] = []; // Use `any` instead of `Room` interface
-  selectedServer: any = null; // Use `any` instead of `Room`
-  users: any[] = []; // Use `any` instead of `User` interface
-  selectedUser: any = null; // Use `any` instead of `string`
+  roomId!: string;
+  servers: any[] = [];
+  selectedServer: any = null;
+  users: any[] = [];
+  selectedUser: any = null;
 
   // Modal state
   isAddServerModalOpen = false;
@@ -33,19 +35,11 @@ export class ChatComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private roomService: RoomService // Inject RoomService
-  ) {
-    // Extract room ID (selectedServer) from the URL
-    this.route.params.subscribe((params) => {
-      this.roomId = params['roomId'];
-      this.selectedServer = this.servers.find((room) => room.name === this.roomId) || null;
+    private roomService: RoomService
+  ) { }
 
-      // Fetch old messages for the selected room
-      this.fetchOldMessages(this.roomId);
-
-      // Connect to WebSocket for real-time updates
-      this.connectToWebSocket();
-    });
+  ngAfterViewChecked() {
+    this.scrollToBottom();
   }
 
   ngOnInit() {
@@ -55,70 +49,130 @@ export class ChatComponent implements OnInit, OnDestroy {
     // Subscribe to servers$ observable
     this.roomService.servers$.subscribe((servers) => {
       this.servers = servers;
+      if (this.servers.length > 0) {
+        this.selectedServer = this.servers[0];
+        this.router.navigate(['/chat', this.selectedServer.name]); // Navigate to the default room
+      }
     });
 
     // Subscribe to users$ observable
     this.roomService.users$.subscribe((users) => {
       this.users = users;
     });
+
+    // Subscribe to route parameter changes
+    this.route.params.subscribe((params) => {
+      const newRoomId = params['roomId'];
+      if (newRoomId !== this.roomId) {
+        this.initializeRoom(newRoomId);
+      }
+    });
   }
 
-  connectToWebSocket() {
+  logout(){
+    localStorage.clear();
+    this.router.navigate(['/auth']);
+  }
+
+  private scrollToBottom(): void {
+    try {
+      this.chatContainer.nativeElement.scrollTop = this.chatContainer.nativeElement.scrollHeight;
+    } catch (err) {
+      console.error('Failed to scroll to bottom:', err);
+    }
+  }
+
+  private initializeRoom(roomId: string) {
+    // Reset data for the new room
+    this.roomId = roomId;
+    this.selectedServer = this.servers.find((room) => room.name === roomId) || null;
+    this.messages = [];
+    this.users = [];
+
+    // Fetch old messages for the new room
+    this.fetchOldMessages(roomId);
+
+    // Connect to WebSocket for real-time updates
+    this.connectToWebSocket();
+
+    // Fetch initial users for the new room
+    this.roomService.getUsersForRoom(roomId);
+  }
+
+  private connectToWebSocket() {
     // Close existing WebSocket connection if it exists
     if (this.socket$) {
       this.socket$.complete();
     }
 
-    // Connect to WebSocket endpoint with roomId (selectedServer)
+    // Connect to WebSocket endpoint with roomId and username
     this.socket$ = webSocket(`ws://localhost:8080/ws/${this.roomId}?username=${localStorage.getItem('username')}`);
 
     // Subscribe to incoming messages
     this.socketSubscription = this.socket$.subscribe({
       next: (message: any) => {
-        let timestamp = new Date(message.timestamp);
-        if (isNaN(timestamp.getTime())) {
-          console.warn('Invalid timestamp, using current date:', message.timestamp);
-          timestamp = new Date(); // Fallback to current date
+        if (message.event === 'USER_JOINED' || message.event === 'USER_LEFT') {
+          // Handle user events
+          this.roomService.getUsersForRoom(this.roomId); // Refresh user list
+        } else {
+          // Handle regular messages
+          this.handleIncomingMessage(message);
         }
-        this.messages.push({
-          sender: message.sender,
-          text: message.text,
-          timestamp: timestamp,
-        });
       },
       error: (err) => console.error('WebSocket error:', err),
       complete: () => console.log('WebSocket connection closed'),
     });
   }
 
-  fetchOldMessages(roomId: string) {
+  private handleIncomingMessage(message: any) {
+    const timestamp = new Date(message.timestamp);
+    this.messages.push({
+      sender: message.sender,
+      text: message.text,
+      timestamp: isNaN(timestamp.getTime()) ? new Date() : timestamp,
+    });
+  }
+
+  private fetchOldMessages(roomId: string) {
     this.roomService.getMessagesForRoom(roomId).subscribe({
       next: (messages: any[]) => {
         this.messages = messages.map((message) => {
-          let timestamp = new Date(message.timestamp);
-          if (isNaN(timestamp.getTime())) {
-            console.warn('Invalid timestamp, using current date:', message.timestamp);
-            timestamp = new Date(); // Fallback to current date
-          }
+          const timestamp = new Date(message.timestamp);
           return {
             sender: message.sender.username,
             text: message.content,
-            timestamp: timestamp,
+            timestamp: isNaN(timestamp.getTime()) ? new Date() : timestamp,
           };
         });
       },
-      error: (err) => {
-        console.error('Failed to fetch old messages:', err);
-      },
+      error: (err) => console.error('Failed to fetch old messages:', err),
     });
   }
 
   selectServer(server: string) {
-    // Navigate to the selected server (room)
+    // Avoid redundant navigation
+    if (this.roomId === server) return;
+
+    // Close current WebSocket and reset data
+    this.disconnectFromWebSocket();
+    this.messages = [];
+    this.users = [];
+
+    // Navigate to the new room
     this.router.navigate(['/chat', server]);
   }
 
+  private disconnectFromWebSocket() {
+    if (this.socket$) {
+      this.socket$.complete();
+    }
+    if (this.socketSubscription) {
+      this.socketSubscription.unsubscribe();
+    }
+  }
+
   selectUser(user: any) {
+    console.log(user);
     this.selectedUser = user;
   }
 
@@ -127,7 +181,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       const messageToSend = {
         sender: localStorage.getItem('username'),
         text: this.currentMessage,
-        roomName: this.roomId, // Include the room name
+        roomName: this.roomId,
       };
 
       // Send the message to the server
@@ -138,14 +192,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     // Close WebSocket connection when component is destroyed
-    if (this.socket$) {
-      this.socket$.complete();
-    }
-
-    // Unsubscribe from the WebSocket subscription
-    if (this.socketSubscription) {
-      this.socketSubscription.unsubscribe();
-    }
+    this.disconnectFromWebSocket();
   }
 
   // Modal methods

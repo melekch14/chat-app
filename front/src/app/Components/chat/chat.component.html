@@ -12,6 +12,9 @@
       </div>
       <div class="server-icon add-server" (click)="openAddServerModal()">+</div>
     </div>
+    <div class="channel-list">
+      <button id="logout" (click)="logout()">Sign out</button>
+  </div>
   </div>
 
   <!-- Main Content -->
@@ -28,7 +31,7 @@
         <span class="status-text">Online</span>
       </div>
     </div>
-    <div class="chat">
+    <div class="chat" #chatContainer>
       <div *ngFor="let message of messages" class="message">
         <div class="message-author">{{ message.sender }}</div>
         <div class="message-content">{{ message.text }}</div>
@@ -57,19 +60,14 @@
     <div
       *ngFor="let user of users"
       class="user"
-      [class.active]="user.username === selectedUser?.username"
       (click)="selectUser(user)"
     >
       <div class="user-avatar">
-        <img src="assets/pic.jpg" alt="{{ user?.username || 'Unknown User' }}" />
+        <img src="assets/pic.jpg" alt="{{ user.username || 'Unknown User' }}" />
       </div>
       <div class="user-info">
-        <span class="username">{{ user?.username || 'Unknown User' }}</span>
-        <span
-          class="user-status-icon"
-          [class.online]="user?.status === 'online'"
-          [class.offline]="user?.status === 'offline'"
-        ></span>
+        <span class="username">{{ user.username || 'Unknown User' }}</span>
+        <span [class.online]></span>
       </div>
     </div>
   </div>
